@@ -1,0 +1,40 @@
+# Reference document — kept locally, never pushed
+osrm_content_plan_v1.docx
+
+# Environment variables (API keys)
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# OSM and OSRM data files (large binaries)
+data/*.pbf
+data/*.osm
+data/*.osrm
+data/*.osrm.*
+data/tmp/
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
