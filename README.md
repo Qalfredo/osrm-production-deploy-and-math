@@ -102,14 +102,14 @@ This downloads the Venezuela `.osm.pbf` from Geofabrik and runs `osrm-extract` +
 docker-compose -f docker/docker-compose.yml up -d
 ```
 
-OSRM is now serving on `http://localhost:5000`.
+OSRM is now serving on `http://localhost:5001`.
 
 ### 4. Test with Python
 
 ```python
 from client.osrm_client import OSRMClient
 
-client = OSRMClient("http://localhost:5000")
+client = OSRMClient("http://localhost:5001")
 
 # Distance matrix for 3 Venezuelan cities: Caracas, Valencia, Maracay
 locations = [

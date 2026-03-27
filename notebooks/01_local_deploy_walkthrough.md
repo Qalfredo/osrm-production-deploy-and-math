@@ -25,10 +25,9 @@ docker info
 
 ## Step 1 — Download Venezuela OSM data
 
-OpenStreetMap extracts are distributed free of charge by [Geofabrik](https://download.geofabrik.de/). The Venezuela extract is ~200 MB.
+OpenStreetMap extracts are distributed free of charge by [Geofabrik](https://download.geofabrik.de/). The Venezuela extract is ~107 MB.
 
 ```bash
-mkdir -p data
 curl -L -o data/venezuela-latest.osm.pbf \
   https://download.geofabrik.de/south-america/venezuela-latest.osm.pbf
 ```
@@ -37,7 +36,7 @@ Check the file arrived:
 
 ```bash
 ls -lh data/venezuela-latest.osm.pbf
-# → something like: -rw-r--r-- 1 user staff 198M ...
+# → something like: -rw-r--r-- 1 user staff 107M ...
 ```
 
 ---
@@ -100,7 +99,7 @@ Expected runtime: **20–60 minutes** for Venezuela. This runs offline — it ne
 ```bash
 docker run --rm -d \
   --name osrm \
-  -p 5000:5000 \
+  -p 5001:5000 \
   -v "$(pwd)/data:/data" \
   ghcr.io/project-osrm/osrm-backend:latest \
   osrm-routed --algorithm ch /data/venezuela-latest.osrm
@@ -115,7 +114,12 @@ docker-compose -f docker/docker-compose.yml up -d
 Check it started:
 
 ```bash
+# If started with docker run (--name osrm):
 docker logs osrm
+
+# If started with docker-compose (container_name: osrm-routed):
+docker logs osrm-routed
+
 # → [info] starting up engines, checksum: ...
 # → [info] running and waiting for requests
 ```
@@ -124,13 +128,13 @@ docker logs osrm
 
 ## Step 5 — Test the API
 
-OSRM exposes a REST API on port 5000. Test all three endpoints used by the Python client.
+OSRM exposes a REST API on port 5001. Test all three endpoints used by the Python client.
 
 ### Nearest (coordinate snapping)
 
 ```bash
 # Snap Caracas Plaza Bolivar to the nearest road
-curl "http://localhost:5000/nearest/v1/driving/-66.9036,10.4806"
+curl "http://localhost:5001/nearest/v1/driving/-66.9036,10.4806"
 ```
 
 Expected response:
@@ -149,7 +153,7 @@ Expected response:
 
 ```bash
 # Caracas → Valencia
-curl "http://localhost:5000/route/v1/driving/-66.9036,10.4806;-67.9936,10.1620?overview=simplified"
+curl "http://localhost:5001/route/v1/driving/-66.9036,10.4806;-67.9936,10.1620?overview=simplified"
 ```
 
 Expected response includes `distance` (metres) and `duration` (seconds).
@@ -158,7 +162,7 @@ Expected response includes `distance` (metres) and `duration` (seconds).
 
 ```bash
 # 3×3 matrix: Caracas, Valencia, Maracay
-curl "http://localhost:5000/table/v1/driving/-66.9036,10.4806;-67.9936,10.1620;-67.5958,10.2469?annotations=duration,distance"
+curl "http://localhost:5001/table/v1/driving/-66.9036,10.4806;-67.9936,10.1620;-67.5958,10.2469?annotations=duration,distance"
 ```
 
 Expected response includes `durations` (seconds) and `distances` (metres) as nested arrays.
@@ -167,10 +171,12 @@ Expected response includes `durations` (seconds) and `distances` (metres) as nes
 
 ## Step 6 — Test with Python
 
+Run from the repo root so the `client` module is on the path.
+
 ```python
 from client import OSRMClient
 
-client = OSRMClient("http://localhost:5000")
+client = OSRMClient("http://localhost:5001")
 
 locations = [
     (10.4806, -66.9036),  # Caracas
@@ -191,10 +197,9 @@ print((durations / 60).round(1))
 
 ## Automated pipeline
 
-The `data/download_and_preprocess.sh` script runs all three steps (download, extract, contract) in sequence with idempotency checks — it skips steps whose output already exists.
+The `data/download_and_preprocess.sh` script runs all three steps (download, extract, contract) in sequence with idempotency checks — it skips steps whose output already exists. It is already executable in the repo.
 
 ```bash
-chmod +x data/download_and_preprocess.sh
 ./data/download_and_preprocess.sh
 ```
 

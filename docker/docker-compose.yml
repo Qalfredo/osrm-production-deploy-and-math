@@ -4,7 +4,7 @@ services:
     container_name: osrm-routed
     command: osrm-routed --algorithm ch /data/venezuela-latest.osrm
     ports:
-      - "5000:5000"
+      - "5001:5000"
     volumes:
       - ../data:/data
     restart: unless-stopped

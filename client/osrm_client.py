@@ -14,7 +14,7 @@ IMPORTANT — coordinate order:
 Usage:
     from client import OSRMClient
 
-    client = OSRMClient("http://localhost:5000")
+    client = OSRMClient("http://localhost:5001")
     distances, durations = client.distance_matrix(
         origins=[(10.4806, -66.9036), (10.1620, -67.9936)],
         destinations=[(10.2469, -67.5958)],
@@ -38,15 +38,15 @@ class OSRMClient:
         Parameters
         ----------
         base_url:
-            OSRM server URL, e.g. "http://localhost:5000".
+            OSRM server URL, e.g. "http://localhost:5001".
             Falls back to the OSRM_BASE_URL environment variable, then
-            "http://localhost:5000".
+            "http://localhost:5001".
         timeout:
             Request timeout in seconds.
         """
         self.base_url = (
             base_url
-            or os.getenv("OSRM_BASE_URL", "http://localhost:5000")
+            or os.getenv("OSRM_BASE_URL", "http://localhost:5001")
         ).rstrip("/")
         self.timeout = timeout
 
